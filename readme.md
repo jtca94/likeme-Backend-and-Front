@@ -12,9 +12,9 @@ The LikeMe App is a web application for creating, viewing, and managing posts. I
 
 - Delete a post: Users can delete a post by sending a DELETE request with the post ID. The post is removed from the database.
 
-- Technologies Used
+## Technologies Used
 
-## The LikeMe App is built using the following technologies:
+The LikeMe App is built using the following technologies:
 
 - Node.js: A JavaScript runtime environment for executing server-side code.
 - Express.js: A fast and minimalist web application framework for Node.js.
