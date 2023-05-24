@@ -43,14 +43,38 @@ npm install
 
 3. Set up the PostgreSQL database and configure the connection details in the `.env` file.
 
-4. Start the development server:
+- Update the values with your PostgreSQL configuration
+
+```plaintext
+PGUSER=your_postgres_user
+PGHOST=your_postgres_host
+PGPASSWORD=your_postgres_password
+PGDATABASE=your_postgres_database
+PGPORT=your_postgres_port
+PORT=3000
+FRONTEND_URL=http://localhost:4000
+```
+
+4. Create the database `likeme` and the next table:
+
+```sql
+CREATE TABLE posts (
+  id SERIAL,
+  titulo VARCHAR(25),
+  img VARCHAR(1000),
+  descripcion VARCHAR(255),
+  likes INT
+);
+```
+
+5. Start the development server:
 
 ```bash
 npm run dev
 ```
 This command starts the server using Nodemon, which automatically restarts the server whenever changes are made to the code.
 
-5. Run the client app
+6. Run the client app
 
 ```bash
 npm start
