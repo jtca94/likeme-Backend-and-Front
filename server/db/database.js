@@ -6,6 +6,8 @@ const pool = new Pool({
   allowExitOnIdle: true,
 });
 
+export {pool};
+
 export const getPosts = async () => {
   const {rows} = await pool.query("SELECT * FROM posts ORDER BY id ASC");
   return rows;
@@ -28,3 +30,9 @@ export const likePost = async (id) => {
   return rows;
  
 }
+
+export const deletePost = async (id) => {
+  const text = "DELETE FROM posts WHERE id = $1 RETURNING *";
+  const {rows} = await pool.query(text, [id]);
+  return rows;
+};

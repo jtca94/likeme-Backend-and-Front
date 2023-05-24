@@ -1,57 +1,85 @@
-import express from "express";
-import {getPosts, createPost, likePost} from "./db/database.js";
-import cors from "cors";
 import * as dotenv from "dotenv";
-
 dotenv.config();
 
-const app = express();
+import express from "express";
+import cors from "cors";
+import {getPosts, createPost, likePost, deletePost, pool} from "./db/database.js";
 
+const app = express();
+// Middleware
 app.use(express.json());
+// CORS
 app.use(cors(
   {
     origin: process.env.FRONTEND_URL,
     optionsSuccessStatus: 200
   }
 ))
-const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+//ROUTES
 //see if server is running ok
 app.get("/", (req, res) => {
   res.send("running");
 });
 //get methods
-app.get("/posts", async (req, res) => {
+app.get("/posts", async (req, res, next) => {
   try {
     const results = await getPosts();
     res.json(results);
-  } catch (error) {
-    res.json({ok: false, error: error.message});
+  } catch (err) {
+    next(err);
   }
 });
 //post methods
-app.post("/posts", async (req, res) => {
+app.post("/posts", async (req, res, next) => {
   try {
     const {titulo, url, descripcion} = req.body;
     const result = await createPost(titulo, url, descripcion);
     res.status(201).json({ ok: true, result: result });
     console.log(result)
-  } catch (error) {
-    res.json({ok: false, error: error.message});
+  } catch (err) {
+    next(err);
   }
 });
 //put method
-app.put("/posts/like/:id", async (req, res) => {
+app.put("/posts/like/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
     const result = await likePost(id);
     res.json({ ok: true, result: result });
 
-  } catch (error) {
-    res.json({ok: false, error: error.message});
+  } catch (err) {
+    next(err);
   }
+});
+//delete method
+app.delete("/posts/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await deletePost(id);
+    res.json({ ok: true, result: result });
+  } catch (err) {
+    next(err);
+  }
+});
 
+// Error handling middleware at the end of pipeline (after routes)
+app.use((err, req, res, next) => {
+  console.error(err);
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({ ok: false, error: err.message });
+});
+
+// Start server and check connection with database
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  pool.connect((err) => {
+    if (err) {
+      console.error('Error connecting to the database:', err);
+      process.exit(1);
+    }
+    console.log('Database connected successfully!');
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
 });
